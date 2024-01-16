@@ -6,10 +6,64 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-width: 200px;
+        }
+
+        .task-title {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .task-info {
+            font-size: 26px;
+        }
+    </style>
 </head>
 <body>
 <a href="get_currency/">currencies</a>
 <h1>Current Temperature:</h1>
 <p>The temperature is: {{ temperature }}C</p>
+
+<div class="wrapper">
+    <form class="form-wrapper" method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" placeholder="title" name="title">
+        <input type="text" placeholder="description" name="description">
+        <input type="submit">
+    </form>
+    {% for task in tasks %}
+    <div class="task-wrapper">
+        <p class="task-title">Title: {{task.title}}</p>
+        <p class="task-info">Description: {{task.description}}</p>
+        <p class="task-info">Completed: {{task.completed}}</p>
+        <form method="post" action="{% url 'delete_task' task.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Delete">
+        </form>
+
+
+        <form class="edit-form" method="POST" action="{% url 'edit_task' task.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" placeholder="Edit title" name="edit_title" value="{{ task.title }}">
+            <input type="text" placeholder="Edit description" name="edit_description" value="{{ task.description }}">
+            <input type="checkbox" name="edit_completed" {% if task.completed %}checked{% endif %}>
+            <input type="submit" value="Edit Task">
+        </form>
+
+        <hr>
+    </div>
+    {% endfor %}
+</div>
+
 </body>
 </html>
